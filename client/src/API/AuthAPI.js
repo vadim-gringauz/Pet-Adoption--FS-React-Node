@@ -1,57 +1,29 @@
 import axios from '../config/axios'
-const serverURL = process.env.REACT_APP_SERVER_URL
+import request from './request'
 
 class AuthAPI {
+  // => { success, newUserID } or { success: false, message }
   static async signUp (newUserData) {
-    try {
-      const response = await axios.post(
-        serverURL + '/user/signup',
-        newUserData,
-        { withCredentials: true }
-      )
-      return {
-        success: true,
-        newUserID: response.data.newUserID
-      }
-    } catch (error) {}
+    return request(() => axios.post('/user/signup', newUserData))
   }
 
+  // => { success, accessToken, signedUser } or { success: false, message }
   static async signIn (credentials) {
     const { email, password } = credentials
-    try {
-      const response = await axios.post(serverURL + '/user/signin', {
-        email,
-        password
-      })
-      return response.data
-    } catch (error) {
-      console.log('error:', error.message)
-      return error
-    }
+    return request(() => axios.post('/user/signin', { email, password }))
   }
 
+  // => { success, accessToken, signedUser } or { success: false, message }
   static async refresh (accessToken) {
-    try {
-      const response = await axios.post(serverURL + '/user/refresh', null, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`
-        }
+    return request(() =>
+      axios.post('/user/refresh', null, {
+        headers: { Authorization: `Bearer ${accessToken}` }
       })
-      return response.data
-    } catch (error) {
-      console.log('error:', error.message)
-      return error
-    }
+    )
   }
 
   static async signOut () {
-    try {
-      const response = await axios.delete(serverURL + '/user/signout')
-      return response
-    } catch (error) {
-      console.log('error:', error.message)
-      return error
-    }
+    return request(() => axios.delete('/user/signout'))
   }
 }
 

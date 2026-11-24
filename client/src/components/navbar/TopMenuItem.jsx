@@ -32,6 +32,10 @@ function TopMenuItem ({ page }) {
   const handleClose = event => {
     setAnchorEl(null)
   }
+  const handleSubPageClick = path => {
+    handleClose()
+    navigate(path)
+  }
 
   return (
     <Box sx={{}}>
@@ -47,7 +51,7 @@ function TopMenuItem ({ page }) {
             onClose={handleClose}
           >
             {page.subPages.map(subPage => (
-              <MenuItem key={subPage.name} onClick={null}>
+              <MenuItem key={subPage.name} onClick={() => handleSubPageClick(subPage.path)}>
                 {subPage.name}
               </MenuItem>
             ))}

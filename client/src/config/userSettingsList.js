@@ -1,25 +1,21 @@
+// The user menu (the avatar in the navbar)
+// permission: 'all' = every signed in user, 'admin' = only admins
 const userSettings = [
     {
         name: 'Profile/Account',
-        onClick: () => {
-            console.log('navigate to Profile page')
-        },
         path: '/profile',
+        permission: 'all',
     },
-    // {
-    //     name: 'Account',
-    //     onClick: () => {
-    //         console.log('navigate to Account page')
-    //     }
-    // },
     {
-        name: 'Dashboard*',
-        onClick: () => {
-            console.log('navigate to Account page')
-        },
-        path: '/dashboard'
+        name: 'My Pets',
+        path: '/my-pets',
+        permission: 'all',
     },
-
+    {
+        name: 'Dashboard',
+        path: '/dashboard',
+        permission: 'admin',
+    },
 ]
 
 export default userSettings

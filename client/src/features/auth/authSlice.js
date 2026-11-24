@@ -18,6 +18,10 @@ export const authSlice = createSlice({
         signedUser: action.payload.signedUser
       }
     },
+    // Merge new data into the signed user (profile update, wish list change...)
+    updateSignedUser: (state, action) => {
+      state.signedUser = { ...state.signedUser, ...action.payload }
+    },
     signOut (state) {
       return {
         ...state,
@@ -29,6 +33,6 @@ export const authSlice = createSlice({
   }
 })
 
-export const { signIn, signOut } = authSlice.actions
+export const { signIn, signOut, updateSignedUser } = authSlice.actions
 
 export default authSlice.reducer

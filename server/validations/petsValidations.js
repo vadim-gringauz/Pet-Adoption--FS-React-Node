@@ -4,7 +4,7 @@ const ajv = new Ajv()
 module.exports.newPetValidation = ajv.compile({
   type: 'object',
   properties: {
-    name: { type: 'string' },
+    name: { type: 'string', minLength: 1 },
     type: { type: 'string', enum: ['dog', 'cat'] },
     breed: { type: 'string' },
     status: { type: 'string', enum: ['adoption', 'foster', 'available'] },
@@ -12,7 +12,8 @@ module.exports.newPetValidation = ajv.compile({
     color: { type: 'string' },
     bio: { type: 'string' },
     hypoallergenic: { type: 'boolean' },
-    dietaryRestrictions: { type: 'string' }
+    dietaryRestrictions: { type: 'string' },
+    image: { type: 'string' }
   },
   required: ['name', 'type', 'size'],
   additionalProperties: false
@@ -21,14 +22,16 @@ module.exports.newPetValidation = ajv.compile({
 module.exports.updatePetValidation = ajv.compile({
   type: 'object',
   properties: {
-    name: { type: 'string' },
+    name: { type: 'string', minLength: 1 },
     type: { type: 'string', enum: ['dog', 'cat'] },
     breed: { type: 'string' },
+    status: { type: 'string', enum: ['adoption', 'foster', 'available'] },
     size: { type: 'string', enum: ['xs', 's', 'm', 'l', 'xl'] },
     color: { type: 'string' },
     bio: { type: 'string' },
     hypoallergenic: { type: 'boolean' },
-    dietaryRestrictions: { type: 'string' }
+    dietaryRestrictions: { type: 'string' },
+    image: { type: 'string' }
   },
   required: [],
   additionalProperties: false
