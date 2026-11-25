@@ -1,126 +1,69 @@
-import axios from 'axios'
-const serverURL = process.env.SERVER_URL
+import axios from '../config/axios'
+import request from './request'
 
 class PetAPI {
-  
+  // Admin only => { success, newPetID }
   static async createPet (newPetData) {
-    try {
-
-      return 
-    } catch (error) {
-      console.error('', error)
-    }
+    return request(() => axios.post('/pet/new', newPetData))
   }
 
-  static async updatePet (updatedPetData) {
-    try {
-
-      return 
-    } catch (error) {
-      console.error('', error)
-    }
+  // Admin only
+  static async updatePet (petID, updatedPetData) {
+    return request(() => axios.patch(`/pet/${petID}`, updatedPetData))
   }
-  
+
+  // Admin only
   static async deletePet (petID) {
-    try {
-
-      return 
-    } catch (error) {
-      console.error('', error)
-    }
+    return request(() => axios.delete(`/pet/${petID}`))
   }
-  
 
-  static async getOnetPet (petID) {
-    try {
-
-      return 
-    } catch (error) {
-      console.error('', error)
-    }
+  // => { success, pet }
+  static async getOnePet (petID) {
+    return request(() => axios.get(`/pet/${petID}`))
   }
-  
-  static async createPet (newPetData) {
-    try {
 
-      return 
-    } catch (error) {
-      console.error('', error)
-    }
+  // filterBy: { type, size, status, name, breed, color, hypoallergenic }
+  // => { success, pets }
+  static async searchPets (filterBy = {}) {
+    const params = {}
+    Object.entries(filterBy).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== '') {
+        params[key] = value
+      }
+    })
+    return request(() => axios.get('/pet/', { params }))
   }
-  
-  static async searchPets (filterBy) {
-    try {
 
-      return 
-    } catch (error) {
-      console.error('', error)
-    }
+  static async getAllPets () {
+    return PetAPI.searchPets()
   }
-  
+
   static async addPetToWishList (petID) {
-    try {
-
-      return 
-    } catch (error) {
-      console.error('', error)
-    }
+    return request(() => axios.post(`/pet/${petID}/save`))
   }
-  
+
   static async removePetFromWishList (petID) {
-    try {
-
-      return 
-    } catch (error) {
-      console.error('', error)
-    }
+    return request(() => axios.delete(`/pet/${petID}/save`))
   }
 
+  // => { success, saved: [pets in the wish list], owned: [adopted / fostered pets] }
   static async getPetsOfUser (userID) {
-    try {
-
-      return 
-    } catch (error) {
-      console.error('', error)
-    }
+    return request(() => axios.get(`/pet/user/${userID}`))
   }
 
   static async reservePetForAdoption (petID) {
-    try {
-
-      return 
-    } catch (error) {
-      console.error('', error)
-    }
+    return request(() => axios.post(`/pet/${petID}/adopt`))
   }
-  
+
   static async reservePetForFoster (petID) {
-    try {
-
-      return 
-    } catch (error) {
-      console.error('', error)
-    }
+    return request(() => axios.post(`/pet/${petID}/foster`))
   }
-  
-  static async clearReservedStatus (petID) {
-    try {
 
-      return 
-    } catch (error) {
-      console.error('', error)
-    }
-  }
-  
-  
-  static async getAllPets () {
-    try {
-      const response = await axios.get(serverURL + '/pet/')
-      return response.data
-    } catch (error) {
-      console.error('Error fetching user data:', error)
-    }
+  // Return a pet that the user adopted / fosters
+  static async clearReservedStatus (petID, status = 'adoption') {
+    const action = status === 'foster' ? 'foster' : 'adopt'
+    return request(() => axios.delete(`/pet/${petID}/${action}`))
   }
 }
 
-export default UserAPI
+export default PetAPI

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   Paper,
@@ -10,10 +10,22 @@ import {
   FormLabel,
   Grid,
 } from '@mui/material'
+import { PET_SIZES, PET_TYPES } from '../config/petOptions'
 
 function QuickSearch() {
 
   const navigate = useNavigate()
+  const [type, setType] = useState('')
+  const [size, setSize] = useState('')
+
+  // opens the search page with the chosen filters: /search?type=dog&size=s
+  const handleSearch = () => {
+    const params = new URLSearchParams()
+    if (type) params.set('type', type)
+    if (size) params.set('size', size)
+    const query = params.toString()
+    navigate(query ? `/search?${query}` : '/search')
+  }
 
   return (
     <Paper
@@ -35,18 +47,19 @@ function QuickSearch() {
           <FormControl size='small' sx={{ width: '100%' }}>
             <InputLabel id="type-label">Type</InputLabel>
             <Select
-              // displayEmpty={true}
               labelId="type-label"
               id="type-select"
-              // value=''
+              value={type}
               label="Type"
-              // onChange={}
+              onChange={event => setType(event.target.value)}
               sx={{
                 backgroundColor: 'white',
               }}
             >
-              <MenuItem value={'dog'}>Dog</MenuItem>
-              <MenuItem value={'cat'}>Cat</MenuItem>
+              <MenuItem value={''}>Any</MenuItem>
+              {PET_TYPES.map(option => (
+                <MenuItem key={option.value} value={option.value}>{option.label}</MenuItem>
+              ))}
             </Select>
           </FormControl>
         </Grid>
@@ -56,16 +69,17 @@ function QuickSearch() {
             <Select
               labelId="size-label"
               id="size-select"
-              // value=''
+              value={size}
               label="Size"
-              // onChange={}
+              onChange={event => setSize(event.target.value)}
               sx={{
                 backgroundColor: 'white',
               }}
             >
-              <MenuItem value={'small'}>Small</MenuItem>
-              <MenuItem value={'medium'}>Medium</MenuItem>
-              <MenuItem value={'big'}>Big</MenuItem>
+              <MenuItem value={''}>Any</MenuItem>
+              {PET_SIZES.map(option => (
+                <MenuItem key={option.value} value={option.value}>{option.label}</MenuItem>
+              ))}
             </Select>
           </FormControl>
         </Grid>
@@ -74,7 +88,7 @@ function QuickSearch() {
             variant='contained'
             size='small'
             sx={{ width: '100%' }}
-            onClick={() => navigate('/search')}
+            onClick={handleSearch}
           >
             Search Pets
           </Button>

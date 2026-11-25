@@ -1,6 +1,7 @@
 import React from 'react'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux'
 import {
   Drawer,
   Button,
@@ -11,6 +12,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 function DrawerMenu({ pages }) {
 
   const navigate = useNavigate()
+  const { isSignedIn } = useSelector((state) => state.auth)
 
   const [openDrawer, setOpenDrawer] = useState(false)
 
@@ -42,8 +44,9 @@ function DrawerMenu({ pages }) {
         open={openDrawer}
         onClose={handleClose}
       >
-        {pages.map(page => (
-          <>
+        {pages
+          .filter(page => page.permission !== 'user' || isSignedIn)
+          .map(page => (
             <Button
               key={page.name}
               onClick={() => handleClick(page.path)}
@@ -51,8 +54,7 @@ function DrawerMenu({ pages }) {
             >
               {page.name}
             </Button>
-          </>
-        ))}
+          ))}
       </Drawer>
     </>
   )

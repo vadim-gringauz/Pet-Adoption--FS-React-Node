@@ -10,46 +10,53 @@ import Typography from '@mui/material/Typography'
 import Container from '@mui/material/Container'
 import ErrorAlert from './ErrorAlert'
 import AuthAPI from '../../API/AuthAPI'
-import useAuth from '../../hooks/useAuth'
-import useToken from '../../hooks/useToken'
+import useSignIn from '../../hooks/useSignIn'
 
 function SignUpForm () {
   const [openAlert, setOpenAlert] = useState(false)
   const [message, setMessage] = useState('')
 
-  const { setAuth } = useAuth()
-  const { saveToken } = useToken()
+  const signIn = useSignIn()
+
+  const showError = text => {
+    setMessage(text)
+    setOpenAlert(true)
+  }
 
   const handleSubmit = async event => {
     event.preventDefault()
     const data = new FormData(event.currentTarget)
     const newUserData = {
-      email: data.get('email'),
+      email: data.get('email').trim(),
       password: data.get('password'),
       passwordVerify: data.get('password-repeat'),
-      firstName: data.get('firstName'),
-      lastName: data.get('lastName'),
-      phone: data.get('phone')
+      firstName: data.get('firstName').trim(),
+      lastName: data.get('lastName').trim(),
+      phone: data.get('phone').trim()
+    }
+
+    if (!newUserData.email || !newUserData.password) {
+      return showError('Please fill your email and a password')
+    }
+    if (newUserData.password.length < 6) {
+      return showError('The password must have at least 6 characters')
+    }
+    if (newUserData.password !== newUserData.passwordVerify) {
+      return showError('The passwords do not match')
     }
 
     const result = await AuthAPI.signUp(newUserData)
+    if (!result.success) {
+      return showError(result.message)
+    }
 
     //! NOW SIGN-IN
-    // TODO write it cleaner without repeating
-    if (result.success) {
-      const credentials = {
-        email: data.get('email'),
-        password: data.get('password')
-      }
-      const result = await AuthAPI.signIn(credentials)
-
-      if (!result.accessToken) {
-        setOpenAlert(true)
-        setMessage('Wrong email or password')
-      }
-
-      setAuth(result.signedUser, result.accessToken)
-      saveToken(result.accessToken)
+    const signInResult = await signIn({
+      email: newUserData.email,
+      password: newUserData.password
+    })
+    if (!signInResult.success) {
+      showError(signInResult.message)
     }
   }
 

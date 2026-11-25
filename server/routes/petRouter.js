@@ -7,15 +7,20 @@ const UsersController = require('../controllers/UsersController')
 const authMiddleware = require('../middlewares/authMiddleware')
 
 //! PUBLIC ROUTES:
-router.post('/new', PetsController.createPet)
-router.get('/:id', PetsController.getPetByID, PetsController.getOnePet)
 router.get('/', PetsController.getPets)
+
+//! PROTECTED TO SIGNED IN USERS:
+// The pets a user saved and the pets a user adopted / fosters (own data or admin)
 router.get(
   '/user/:id',
+  authMiddleware,
+  UsersController.isSelfOrAdmin,
   UsersController.getUserByID,
-  UsersController.getPetsByUser,
-  PetsController.getPets
+  PetsController.getPetsOfUser
 )
+
+//! PUBLIC ROUTES (single pet):
+router.get('/:id', PetsController.getPetByID, PetsController.getOnePet)
 
 //! PROTECTED TO SIGNED IN USERS:
 router.post(
@@ -34,7 +39,7 @@ router.post(
   '/:id/foster',
   authMiddleware,
   PetsController.getPetByID,
-  PetsController.adopt
+  PetsController.foster
 )
 router.delete(
   '/:id/foster',
@@ -48,7 +53,6 @@ router.post(
   PetsController.getPetByID,
   UsersController.addPetToWishList
 )
-
 router.delete(
   '/:id/save',
   authMiddleware,
@@ -57,6 +61,12 @@ router.delete(
 )
 
 //! PROTECTED TO ADMIN:
+router.post(
+  '/new',
+  authMiddleware,
+  UsersController.isAdmin,
+  PetsController.createPet
+)
 router.patch(
   '/:id',
   authMiddleware,

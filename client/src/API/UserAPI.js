@@ -1,62 +1,35 @@
-import axios from 'axios'
-const serverURL = process.env.SERVER_URL
+import axios from '../config/axios'
+import request from './request'
 
 class UserAPI {
+  // Admin only => { success, users }
   static async getAllUsers () {
-    try {
-      const response = await axios.get(serverURL + '/user/')
-      return response.data
-    } catch (error) {
-      console.error('Error fetching user data:', error)
-    }
+    return request(() => axios.get('/user/'))
   }
 
+  // => { success, user }
   static async getOneUser (userID) {
-    try {
-      
-      return 
-    } catch (error) {
-      console.error('', error)
-    }
+    return request(() => axios.get(`/user/${userID}`))
   }
 
+  // => { success, user } (the updated user)
   static async updateUser (userID, newUserData) {
-    try {
-      
-      return 
-    } catch (error) {
-      console.error('', error)
-    }
+    return request(() => axios.patch(`/user/${userID}`, newUserData))
   }
 
-
-
-
+  // Admin only
   static async makeUserAdmin (userID) {
-    try {
-      
-      return 
-    } catch (error) {
-      console.error('', error)
-    }
-  }
-  
-  static async removeAdmin (userID) {
-    try {
-      
-      return 
-    } catch (error) {
-      console.error('', error)
-    }
+    return request(() => axios.patch(`/user/${userID}/make-admin`))
   }
 
+  // Admin only
+  static async removeAdmin (userID) {
+    return request(() => axios.delete(`/user/${userID}/make-admin`))
+  }
+
+  // Admin only
   static async deleteUser (userID) {
-    try {
-      
-      return 
-    } catch (error) {
-      console.error('', error)
-    }
+    return request(() => axios.delete(`/user/${userID}`))
   }
 }
 

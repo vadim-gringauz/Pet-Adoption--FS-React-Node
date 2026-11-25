@@ -10,16 +10,13 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
 import Typography from '@mui/material/Typography'
 import Container from '@mui/material/Container'
 import ErrorAlert from './ErrorAlert'
-import AuthAPI from '../../API/AuthAPI'
-import useAuth from '../../hooks/useAuth'
-import useToken from '../../hooks/useToken'
+import useSignIn from '../../hooks/useSignIn'
 
 function SignInForm () {
   const [openAlert, setOpenAlert] = useState(false)
   const [message, setMessage] = useState('')
 
-  const { setAuth } = useAuth()
-  const { saveToken } = useToken()
+  const signIn = useSignIn()
 
   const handleSubmit = async event => {
     event.preventDefault()
@@ -28,15 +25,12 @@ function SignInForm () {
       email: data.get('email'),
       password: data.get('password')
     }
-    const result = await AuthAPI.signIn(credentials)
+    const result = await signIn(credentials)
 
-    if (!result.accessToken) {
+    if (!result.success) {
       setOpenAlert(true)
-      setMessage('Wrong email or password')
+      setMessage(result.message)
     }
-
-    setAuth(result.signedUser, result.accessToken)
-    saveToken(result.accessToken)
   }
 
   return (

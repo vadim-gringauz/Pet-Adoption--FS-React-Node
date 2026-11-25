@@ -59,6 +59,22 @@ const pages = [
       path: '/wish-list',
     permission: 'user',
     },
+    {
+      name: 'My Pets',
+      onClick: () => {
+        console.log('navigate to My Pets page')
+      },
+      path: '/my-pets',
+      permission: 'user',
+    },
+    {
+      name: 'Contact',
+      onClick: () => {
+        console.log('navigate to Contact page')
+      },
+      path: '/contact',
+      permission: 'all',
+    },
   ]
 
   export default pages

@@ -45,19 +45,24 @@ function UserMenu () {
   }
 
   const handleSignOut = async () => {
-    const result = await AuthAPI.signOut()
-    if (result.data.success) {
-      dispatch(signOut())
-      deleteToken()
-    }
+    handleCloseUserMenu()
+    // the token is only kept on this device, so the user is signed out even if the server cannot be reached
+    await AuthAPI.signOut()
+    deleteToken()
+    dispatch(signOut())
+    navigate('/')
   }
+
+  const visibleSettings = userSettings.filter(
+    setting => setting.permission !== 'admin' || signedUser?.permission === 'admin'
+  )
 
   return (
     <>
       <Tooltip title='Open settings'>
         <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
           <Avatar
-            alt='Remy Sharp'
+            alt={signedUser?.firstName || signedUser?.email}
             src={signedUser?.avatar}
             sx={{ width: size, height: size }}
           />
@@ -79,7 +84,7 @@ function UserMenu () {
         open={Boolean(anchorElUser)}
         onClose={handleCloseUserMenu}
       >
-        {userSettings.map(userSetting => (
+        {visibleSettings.map(userSetting => (
           <MenuItem
             key={userSetting.name}
             onClick={() => handleOnClick(userSetting.path)}

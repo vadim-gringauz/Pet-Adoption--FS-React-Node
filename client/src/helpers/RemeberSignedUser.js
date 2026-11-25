@@ -6,6 +6,8 @@ import useToken from '../hooks/useToken'
 import useAuth from '../hooks/useAuth'
 import useRefreshToken from '../hooks/useRefreshToken'
 
+// Wraps the pages: when the page is (re)loaded and there is a saved token,
+// the user is signed in again before showing the page
 function RemeberSignedUser () {
   const [isLoading, setIsLoading] = useState(true)
   const { auth } = useAuth()
@@ -13,28 +15,29 @@ function RemeberSignedUser () {
   const refresh = useRefreshToken()
 
   useEffect(() => {
+    let cancelled = false
+
     const verifyToken = async () => {
       try {
         await refresh()
       } catch (err) {
         console.log(err)
+      } finally {
+        // also when the token was not good anymore - otherwise the spinner never ends
+        if (!cancelled) setIsLoading(false)
       }
     }
 
-    const tokenFromStorage = loadToken()
-    if (!tokenFromStorage) {
+    if (!loadToken() || auth.accessToken) {
       setIsLoading(false)
-      return
+    } else {
+      verifyToken()
     }
 
-    !auth.accessToken ? verifyToken() : setIsLoading(false)
+    return () => {
+      cancelled = true
+    }
   }, []) // eslint-disable-line
-
-  useEffect(() => {
-    if (auth.signedUser !== null && auth.signedUser !== undefined) {
-      setIsLoading(false)
-    }
-  }, [auth])
 
   return (
     <>

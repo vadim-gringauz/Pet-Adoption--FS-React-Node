@@ -1,5 +1,6 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 import { Container, Box, Stack, Button } from '@mui/material'
 import AppInfo from './AppInfo'
 import CreatedWith from './CreatedWith'
@@ -7,6 +8,7 @@ import pages from '../../config/pages'
 
 function Footer () {
   const navigate = useNavigate()
+  const { isSignedIn } = useSelector(state => state.auth)
 
   return (
     <Box
@@ -29,7 +31,7 @@ function Footer () {
               spacing={8}
               sx={{ display: { xs: 'none', md: 'flex' } }}
             >
-              {pages.map(page => (
+              {pages.filter(page => page.permission !== 'user' || isSignedIn).map(page => (
                 <Stack key={page.name}>
                   <Button
                     size='small'
@@ -45,19 +47,17 @@ function Footer () {
                   {page.subPages && (
                     <Stack>
                       {page.subPages.map(subPage => (
-                        <>
-                          <Button
-                            size='small'
-                            key={subPage.name}
-                            onClick={() => navigate(subPage.path)}
-                            sx={{
-                              fontSize: '1rem',
-                              '&:hover': { textDecoration: 'underline' }
-                            }}
-                          >
-                            {subPage.name}
-                          </Button>
-                        </>
+                        <Button
+                          size='small'
+                          key={subPage.name}
+                          onClick={() => navigate(subPage.path)}
+                          sx={{
+                            fontSize: '1rem',
+                            '&:hover': { textDecoration: 'underline' }
+                          }}
+                        >
+                          {subPage.name}
+                        </Button>
                       ))}
                     </Stack>
                   )}

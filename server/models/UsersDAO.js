@@ -8,27 +8,31 @@ const userSchema = new mongoose.Schema({
   avatar: { type: String, required: false, default: null },
   phone: { type: String, required: false, default: null },
   createdAt: { type: Date, required: true, default: Date.now },
-  permission: { type: String, default: 'user' },
+  permission: { type: String, enum: ['user', 'admin'], default: 'user' },
   petsWishList: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Pet' }],
   settings: {
     darkMode: { type: Boolean, required: true, default: false }
   }
 })
 
-const User = mongoose.model('User', userSchema)
+const User = mongoose.models.User || mongoose.model('User', userSchema)
 
 module.exports = class UsersDAO {
   //
   static async createUser (newUserObject) {
     const user = new User(newUserObject)
     await user.save()
-    // TODO: add user to DB... password...
-    //
     return user._id
   }
 
+  // None of the "get" functions below return the password hash,
+  // except getUserByEmail which is only used for signing in.
   static async getAll () {
-    return await User.find()
+    return await User.find().select('-password')
+  }
+
+  static async getAdmins () {
+    return await User.find({ permission: 'admin' }).select('-password')
   }
 
   static async getUserByEmail (email) {
@@ -37,7 +41,7 @@ module.exports = class UsersDAO {
 
   static async getUserByID (id) {
     try {
-      const user = await User.findById(id)
+      const user = await User.findById(id).select('-password')
       return user
     } catch (err) {
       return
@@ -50,22 +54,27 @@ module.exports = class UsersDAO {
   }
 
   static async updateUser (id, updateFields) {
-
     const result = await User.updateOne({ _id: id }, { $set: updateFields })
     return result
   }
-  
-  static async addPetToWishList (userID, petID) {
 
-    const result = await User.updateOne({ _id: userID }, { $addToSet: { petsWishList: petID } })
+  static async setPermission (id, permission) {
+    return await User.updateOne({ _id: id }, { $set: { permission } })
+  }
+
+  static async addPetToWishList (userID, petID) {
+    const result = await User.updateOne(
+      { _id: userID },
+      { $addToSet: { petsWishList: petID } }
+    )
     return result
   }
-  
-  static async removePetFromWishList (userID, petID) {
 
-    const result = await User.updateOne({ _id: userID }, { $pull: { petsWishList: petID } })
-    console.log(User)
-    console.log(result)
+  static async removePetFromWishList (userID, petID) {
+    const result = await User.updateOne(
+      { _id: userID },
+      { $pull: { petsWishList: petID } }
+    )
     return result
   }
 }

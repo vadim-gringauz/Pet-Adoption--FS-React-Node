@@ -1,12 +1,17 @@
-const express = require('express');
-const router = express.Router();
+const express = require('express')
+const router = express.Router()
 
-router.get('/', (req, res) => {
-  // return all admins
-});
+const AdminController = require('../controllers/AdminController')
+const UsersController = require('../controllers/UsersController')
+const authMiddleware = require('../middlewares/authMiddleware')
 
+//! PROTECTED TO ADMIN:
+// return all admins
+router.get(
+  '/',
+  authMiddleware,
+  UsersController.isAdmin,
+  AdminController.getAdmins
+)
 
-
-
-
-module.exports = router;
+module.exports = router
